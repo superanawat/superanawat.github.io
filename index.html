@@ -2,11 +2,10 @@
 <html lang="th">
 <head>
     <meta charset="utf-8">
-    <!-- Viewport Tag เพื่อรองรับ Responsive บน Mobile และป้องกันการย่อขยายแมพผิดปกติ -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Street Food Radar</title>
+    <title>Risk Assessment Map</title>
     
-    <!-- ใช้ CDN สำหรับ Leaflet และ Leaflet Search -->
+    <!-- CDN สำหรับ Leaflet และ Leaflet Search -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-search@3.0.9/dist/leaflet-search.min.css" />
     
@@ -22,6 +21,7 @@
             height: 100%;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f8fafc;
         }
 
         #map { 
@@ -30,68 +30,155 @@
         }
 
         /* =========================================
-           อนิเมชันนาฬิกาทราย
-           ========================================= */
-        .hourglass-anim {
-            display: inline-block;
-            animation: hourglass-flip 2.5s infinite ease-in-out;
-        }
-
-        @keyframes hourglass-flip {
-            0% { transform: rotate(0deg); }
-            40% { transform: rotate(180deg); }
-            50% { transform: rotate(180deg); }
-            90% { transform: rotate(360deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* =========================================
-           ปรับแต่ง Leaflet Popup ให้ Responsive
+           ปรับแต่ง Leaflet Popup ให้กว้างและสวยงามขึ้น
            ========================================= */
         .leaflet-popup-content-wrapper {
-            border-radius: 8px;
-            padding: 4px;
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         .leaflet-popup-content {
-            margin: 12px 15px;
-            line-height: 1.4;
-            max-width: 280px;
+            margin: 0 !important;
+            width: 340px !important;
+            max-width: 90vw;
+            line-height: 1.5;
+            color: #1e293b;
         }
 
         /* =========================================
-           ปรับแต่ง Responsive สำหรับอุปกรณ์มือถือ (Mobile)
+           องค์ประกอบ UI การประเมินความเสี่ยง
            ========================================= */
+        .risk-card {
+            padding: 16px;
+            background: #ffffff;
+        }
+
+        .risk-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+
+        .risk-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .risk-score-badge {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .score-dots {
+            letter-spacing: 1px;
+            font-size: 11px;
+        }
+
+        /* กล่องขยายดูรายละเอียดการคำนวณ (Accordion) */
+        .calc-details {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .calc-details summary {
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            user-select: none;
+            background: #f1f5f9;
+            transition: background 0.2s;
+        }
+
+        .calc-details summary:hover {
+            background: #e2e8f0;
+        }
+
+        .calc-body {
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        /* ตารางแสดงการถ่วงน้ำหนัก */
+        .weight-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 6px;
+        }
+
+        .weight-table th, .weight-table td {
+            text-align: left;
+            padding: 6px 4px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .weight-table th {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .weight-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .value-pill {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .score-highlight {
+            font-weight: 700;
+            color: #dc2626;
+        }
+
+        .calc-formula {
+            color: #64748b;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .total-box {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fef2f2;
+            border-radius: 6px;
+            border-left: 3px solid #ef4444;
+            font-size: 12px;
+            color: #991b1b;
+        }
+
+        /* Mobile Responsive */
         @media (max-width: 600px) {
-            /* ปรับขนาดช่องค้นหาบนมือถือให้ใหญ่ขึ้นและแตะง่ายขึ้น */
-            .leaflet-control-search .search-input {
-                font-size: 14px !important;
-                height: 36px !important;
-                padding: 0 10px !important;
-                width: 180px !important;
-            }
-
-            .leaflet-control-search .search-button {
-                width: 36px !important;
-                height: 36px !important;
-            }
-
-            /* ปรับแต่งเนื้อหา Popup สำหรับหน้าจอเล็ก */
             .leaflet-popup-content {
-                max-width: 230px;
-                font-size: 13px;
+                width: 290px !important;
             }
-
-            .leaflet-popup-content button {
-                width: 100%;
-                padding: 8px 12px !important;
-                font-size: 13px !important;
-            }
-
-            /* ขยับ Control บนแผนที่ให้อยู่ในระยะที่กดสะดวก */
-            .leaflet-touch .leaflet-control-layers, 
-            .leaflet-touch .leaflet-bar {
-                border-width: 1px;
+            .weight-table {
+                font-size: 11px;
             }
         }
     </style>
@@ -99,11 +186,8 @@
 <body>
     <div id="map"></div>
 
-    <!-- โหลด JavaScript ผ่าน CDN ตามลำดับ -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-search@3.0.9/dist/leaflet-search.min.js"></script>
-    
-    <!-- สคริปต์หลักของเรา -->
     <script src="script.js"></script>
 </body>
 </html>
