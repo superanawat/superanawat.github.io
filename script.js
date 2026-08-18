@@ -37,7 +37,10 @@ fetch(GAS_URL)
 
         popupContent.querySelector('button').addEventListener('click', () => {
           const aiBox = popupContent.querySelector('p');
-          aiBox.innerHTML = '⏳ กำลังให้ AI วิเคราะห์ข้อมูล...';
+            
+          // ใส่คลาส hourglass-anim เพื่อให้นาฬิกาทรายเคลื่อนไหว
+          aiBox.innerHTML = '<span class="hourglass-anim">⏳</span> กำลังให้ AI วิเคราะห์ข้อมูล...';
+            
           fetch(`${NGROK_URL}/analyze`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
