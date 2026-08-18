@@ -13,11 +13,11 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// สร้าง Layer Group ไว้เก็บหมุด (สำคัญมากสำหรับการค้นหา)
-const schoolMarkers = L.layerGroup().addTo(map);
-
 const NGROK_URL = 'https://tipped-roast-tamale.ngrok-free.dev';
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbz9hjgjQPYlVYKMrvae0gDfqzoDsea8IRZRsSdSjv1IkgN6kF0i_LarNBYLyHn-DHaLUQ/exec'; 
+
+// สร้าง Layer Group สำหรับเก็บหมุด
+const schoolMarkers = L.layerGroup().addTo(map);
 
 fetch(GAS_URL)
   .then(response => response.json())
@@ -48,17 +48,17 @@ fetch(GAS_URL)
           .catch(err => { aiBox.innerHTML = '❌ เกิดข้อผิดพลาด'; console.error(err); });
         });
 
-        // สร้างหมุดและเพิ่ม property 'name' ให้ Marker เพื่อให้ Search หาเจอ
-        const marker = L.marker([school.lat, school.lng]).bindPopup(popupContent);
-        marker.name = school.name; // กำหนดชื่อให้ Marker
-        marker.addTo(schoolMarkers); // เพิ่มเข้า Layer Group แทน map
+        // สร้าง Marker และกำหนด title ให้ตรงกับชื่อโรงเรียน (เพื่อให้ปลั๊กอินค้นหาอ่านได้ถูกต้อง)
+        const marker = L.marker([school.lat, school.lng], { title: school.name })
+          .bindPopup(popupContent);
+        
+        marker.addTo(schoolMarkers);
       }
     });
 
-    // เพิ่มระบบ Search
+    // กำหนดค่าระบบ Search รองรับข้อมูลแบบมาตรฐาน
     map.addControl(new L.Control.Search({
         layer: schoolMarkers,
-        propertyName: 'name', // ค้นหาจาก property .name ที่เราตั้งไว้
         initial: false,
         zoom: 16,
         marker: false,
