@@ -12,12 +12,15 @@
         body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100vw; }
         
-        /* ดึงรูปไอคอนค้นหาและตัวโหลดจากโฟลเดอร์เดียวกันบน GitHub Pages */
-        .search-button {
-            background-image: url('./search-icon.png') !important;
+        /* บังคับลบล้างเส้นทางรูปภาพเดิมของ leaflet-search แบบเจาะจง */
+        .leaflet-control-search .search-button {
+            background: url('./search-icon.png') no-repeat center center !important;
+            background-color: #fff !important;
+            background-size: 18px 18px !important;
         }
-        .search-load {
-            background-image: url('./loader.gif') !important;
+        .leaflet-control-search .search-load {
+            background: url('./loader.gif') no-repeat center center !important;
+            background-size: 18px 18px !important;
         }
     </style>
 </head>
