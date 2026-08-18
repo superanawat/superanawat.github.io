@@ -1,5 +1,5 @@
 // ดึงข้อมูลจาก Google Apps Script
-fetch('https://script.google.com/macros/s/AKfycbzKjqKebNck4w5AOea_kZci5o7o-KVD5sbVa0pWf4PMZ3hAYWWYXOd6ltcRkwpzsYM85Q/exec')
+fetch('https://script.google.com/macros/s/AKfycbz9hjgjQPYlVYKMrvae0gDfqzoDsea8IRZRsSdSjv1IkgN6kF0i_LarNBYLyHn-DHaLUQ/exec')
   .then(response => response.json())
   .then(schools => {
     schools.forEach(school => {
