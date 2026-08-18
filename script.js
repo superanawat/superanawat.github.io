@@ -62,8 +62,22 @@ fetch(GAS_URL)
 
         analyzeBtn.addEventListener('click', () => {
           // แสดงสถานะระหว่างรอคำตอบจาก AI
-          aiBox.innerHTML =
-            '<div style="padding: 8px; text-align: center; color: #2563eb;"><span class="hourglass-anim">⏳</span> กำลังให้ AI วิเคราะห์ข้อมูล...</div>';
+          // แสดงสถานะระหว่างรอคำตอบจาก AI (Gemini Sparkle Icon)
+          aiBox.innerHTML = `
+            <div style="padding: 10px; text-align: center; color: #4f46e5; font-weight: 500;">
+              <svg class="gemini-sparkle" viewBox="0 0 24 24" width="20" height="20" fill="none" style="margin-right: 6px;">
+                <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" fill="url(#gemini-grad)"/>
+                <defs>
+                  <linearGradient id="gemini-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4285F4" />
+                    <stop offset="50%" stop-color="#9B72CB" />
+                    <stop offset="100%" stop-color="#D96570" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              กำลังให้ AI วิเคราะห์ข้อมูล...
+            </div>
+          `;
           analyzeBtn.style.display = 'none';
 
           fetch(`${NGROK_URL}/analyze`, {
