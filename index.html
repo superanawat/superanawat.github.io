@@ -9,8 +9,16 @@
     <link rel="stylesheet" href="./leaflet-search.min.css" />
     
     <style>
-        body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100vw; }
+            body { margin: 0; padding: 0; }
+            #map { height: 100vh; width: 100vw; }
+            
+            /* กำหนดให้ไอคอนค้นหาและตัวโหลดดึงจาก CDN โดยตรงเพื่อแก้ปัญหา 404 */
+            .search-button {
+                background-image: url('https://unpkg.com/leaflet-search@3.0.9/images/search-icon.png') !important;
+            }
+            .search-load {
+                background-image: url('https://unpkg.com/leaflet-search@3.0.9/images/loader.gif') !important;
+            }
     </style>
 </head>
 <body>
