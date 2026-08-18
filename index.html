@@ -4,38 +4,23 @@
     <meta charset="utf-8">
     <title>Street Food Radar</title>
     
-    <!-- 1. CSS ต้องอยู่บนสุด -->
-    <link rel="stylesheet" href="./leaflet.css" />
-    <link rel="stylesheet" href="./leaflet-search.min.css" />
+    <!-- ใช้ CDN สำหรับ Leaflet และ Leaflet Search (ปัญหาเรื่องรูปภาพจะหายไปทันที) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-search@3.0.9/dist/leaflet-search.min.css" />
     
     <style>
         body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100vw; }
-        
-        /* บังคับลบล้างเส้นทางรูปภาพเดิมของ leaflet-search แบบเจาะจง */
-        .leaflet-control-search .search-button {
-            background: url('./search-icon.png') no-repeat center center !important;
-            background-color: #fff !important;
-            background-size: 18px 18px !important;
-        }
-        .leaflet-control-search .search-load {
-            background: url('./loader.gif') no-repeat center center !important;
-            background-size: 18px 18px !important;
-        }
     </style>
 </head>
 <body>
     <div id="map"></div>
 
-    <!-- 2. โหลด JS ตามลำดับความสำคัญ (ตัวหลัก -> ปลั๊กอิน -> สคริปต์ของเรา) -->
+    <!-- โหลด JavaScript ผ่าน CDN ตามลำดับ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-search@3.0.9/dist/leaflet-search.min.js"></script>
     
-    <!-- โหลด Leaflet ก่อน -->
-    <script src="./leaflet.js"></script>
-    
-    <!-- ตามด้วยปลั๊กอินค้นหา -->
-    <script src="./leaflet-search.min.js"></script>
-    
-    <!-- ปิดท้ายด้วยไฟล์ของเรา -->
+    <!-- สคริปต์หลักของเรา -->
     <script src="script.js"></script>
 </body>
 </html>
