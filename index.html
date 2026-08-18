@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Street Food Radar</title>
     <!-- เรียกใช้ CSS ของ Leaflet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./leaflet.css"/>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { height: 100vh; width: 100vw; }
+    </style>
 </head>
 <body>
-    <div id="map" style="height: 100vh;"></div>
-    <!-- เรียกใช้ JS ของ Leaflet -->
+    <!-- พื้นแสดงแผนที่ -->
+    <div id="map"></div>
+
+    <!-- เรียกใช้ JS ของ Leaflet จาก CDN -->
     <script src="./leaflet.js"></script>
+    
+    <!-- เรียกใช้ไฟล์สคริปต์หลักของคุณสำหรับดึงข้อมูลโรงเรียน -->
+    <script src="script.js"></script>
 </body>
 </html>
