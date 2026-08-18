@@ -7,7 +7,7 @@ L.Icon.Default.mergeOptions({
 });
 
 // 1. สร้างแผนที่และกำหนดจุดเริ่มต้น (กรุงเทพฯ)
-var map = L.map('map').setView([13.7563, 100.5018], 11);
+var map = L.map('map').setView([16.43211368, 102.8356812], 11);
 
 // 2. ดึงแผนที่พื้นหลัง OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
