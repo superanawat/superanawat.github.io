@@ -11,6 +11,22 @@
     <style>
         body { margin: 0; padding: 0; }
         #map { height: 100vh; width: 100vw; }
+        /* =========================================
+           เพิ่ม CSS สำหรับอนิเมชันนาฬิกาทรายตรงนี้
+           ========================================= */
+        .hourglass-anim {
+            display: inline-block; /* จำเป็นต้องมีเพื่อให้การหมุน (transform) ทำงาน */
+            animation: hourglass-flip 2.5s infinite ease-in-out; /* สั่งให้หมุนวนลูป */
+        }
+
+        /* จำลองจังหวะการพลิกของนาฬิกาทราย */
+        @keyframes hourglass-flip {
+            0% { transform: rotate(0deg); }
+            40% { transform: rotate(180deg); } /* พลิกกลับหัว */
+            50% { transform: rotate(180deg); } /* หยุดพักให้น้ำทรายไหล */
+            90% { transform: rotate(360deg); } /* พลิกกลับมาตั้งตรง */
+            100% { transform: rotate(360deg); } /* หยุดพัก */
+        }
     </style>
 </head>
 <body>
