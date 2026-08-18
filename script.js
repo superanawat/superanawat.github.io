@@ -61,8 +61,6 @@ fetch(GAS_URL)
         const aiBox = popupContent.querySelector('.ai-box');
 
         analyzeBtn.addEventListener('click', () => {
-          // แสดงสถานะระหว่างรอคำตอบจาก AI
-          // แสดงสถานะระหว่างรอคำตอบจาก AI (Gemini Sparkle Icon)
           aiBox.innerHTML = `
             <div style="padding: 10px; text-align: center; color: #4f46e5; font-weight: 500;">
               <svg class="gemini-sparkle" viewBox="0 0 24 24" width="20" height="20" fill="none" style="margin-right: 6px;">
@@ -96,7 +94,28 @@ fetch(GAS_URL)
               const score = data.risk_score || 3.4;
               const icons = data.risk_icons || '🔴🔴🔴⚪️⚪️⚪️⚪️⚪️⚪️⚪️';
 
-              // แสดงผลวิเคราะห์ AI พร้อมการ์ดแสดงรายละเอียดการคำนวณคะแนนความเสี่ยง
+              // วนลูปสร้างแถวตารางจาก breakdown ทั้ง 5 ปัจจัยที่ส่งมาจาก Backend
+              let breakdownRowsHtml = '';
+              let sumScore100 = 0;
+              let scorePartsString = '';
+
+              if (data.breakdown && data.breakdown.length > 0) {
+                const scoresList = [];
+                data.breakdown.forEach((item, index) => {
+                  breakdownRowsHtml += `
+                    <tr style="border-bottom: 1px dashed #e2e8f0;">
+                      <td style="padding: 4px;">${index + 1}. ${item.title}<br><span style="color: #64748b;">${item.subtitle}</span></td>
+                      <td style="padding: 4px;"><span class="value-pill">${item.weight_label}</span></td>
+                      <td style="padding: 4px; color: #dc2626; font-weight: 600;">+${item.score_added}</td>
+                    </tr>
+                  `;
+                  scoresList.push(item.score_added);
+                  sumScore100 += item.score_added;
+                });
+                scorePartsString = scoresList.join(' + ');
+              }
+
+              // แสดงผลวิเคราะห์ AI พร้อมการ์ดแสดงรายละเอียดการคำนวณคะแนนความเสี่ยงครบ 5 ปัจจัย
               aiBox.innerHTML = `
               <div style="border-top: 1px solid #e2e8f0; padding-top: 8px; margin-top: 8px;">
                 ${formattedResult}
@@ -116,30 +135,11 @@ fetch(GAS_URL)
                       </tr>
                     </thead>
                     <tbody>
-                      <tr style="border-bottom: 1px dashed #e2e8f0;">
-                        <td style="padding: 4px;">1. เด็กไม่ได้อยู่กับพ่อแม่<br><span style="color: #64748b;">(35.5% × 20%)</span></td>
-                        <td style="padding: 4px;"><span class="value-pill">20%</span></td>
-                        <td style="padding: 4px; color: #dc2626; font-weight: 600;">+7.1</td>
-                      </tr>
-                      <tr style="border-bottom: 1px dashed #e2e8f0;">
-                        <td style="padding: 4px;">2. การค้นหาอาวุธปืน<br><span style="color: #64748b;">(36.0 × 40%)</span></td>
-                        <td style="padding: 4px;"><span class="value-pill">40%</span></td>
-                        <td style="padding: 4px; color: #dc2626; font-weight: 600;">+14.4</td>
-                      </tr>
-                      <tr style="border-bottom: 1px dashed #e2e8f0;">
-                        <td style="padding: 4px;">3. การใช้อินเทอร์เน็ต<br><span style="color: #64748b;">(80.0% × 10%)</span></td>
-                        <td style="padding: 4px;"><span class="value-pill">10%</span></td>
-                        <td style="padding: 4px; color: #dc2626; font-weight: 600;">+8.0</td>
-                      </tr>
-                      <tr style="border-bottom: 1px dashed #e2e8f0;">
-                        <td style="padding: 4px;">4. ความหนาแน่นประชากร<br><span style="color: #64748b;">(15.0% × 30%)</span></td>
-                        <td style="padding: 4px;"><span class="value-pill">30%</span></td>
-                        <td style="padding: 4px; color: #dc2626; font-weight: 600;">+4.5</td>
-                      </tr>
+                      ${breakdownRowsHtml}
                     </tbody>
                   </table>
                   <div class="total-box" style="margin-top: 8px; padding: 8px; background: #fef2f2; border-left: 3px solid #ef4444; border-radius: 4px; color: #991b1b; font-size: 11px;">
-                    <strong>คะแนนรวม:</strong> 7.1 + 14.4 + 8.0 + 4.5 = <strong>34.0 / 100</strong><br>
+                    <strong>คะแนนรวม:</strong> ${scorePartsString} = <strong>${sumScore100.toFixed(1)} / 100</strong><br>
                     แปลงเป็นสเกลเต็ม 10 = <strong>${score} / 10</strong> ${icons}
                   </div>
                 </div>
