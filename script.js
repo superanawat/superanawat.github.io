@@ -1,3 +1,33 @@
+// แก้ไขปัญหาหาภาพหมุดไม่พบ โดยกำหนดให้ดึงจาก CDN โดยตรง
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+// --- โค้ดเดิมของคุณต่อด้านล่างนี้ได้เลย ---
+var map = L.map('map').setView([13.7563, 100.5018], 11);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+const GAS_URL = 'ใส่_Web_App_URL_ของคุณที่นี่'; 
+
+fetch(GAS_URL)
+  .then(response => response.json())
+  .then(schools => {
+    schools.forEach(school => {
+      if (school.lat && school.lng) {
+        L.marker([school.lat, school.lng]).addTo(map)
+          .bindPopup(`<b>${school.name}</b><br>${school.address}`);
+      }
+    });
+  })
+  .catch(error => console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error));
+
 // 1. สร้างแผนที่และกำหนดจุดเริ่มต้น (กรุงเทพฯ)
 var map = L.map('map').setView([13.7563, 100.5018], 11);
 
