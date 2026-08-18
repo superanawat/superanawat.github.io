@@ -181,9 +181,71 @@
                 font-size: 11px;
             }
         }
+        /* =========================================
+           1. สไตล์สำหรับ Floating Brand Header
+           ========================================= */
+        .brand-header {
+            position: absolute;
+            top: 12px;
+            left: 60px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 8px 14px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .brand-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .brand-subtitle {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 1px;
+        }
+
+        /* =========================================
+           2. อนิเมชันไอคอน Gemini Sparkle
+           ========================================= */
+        .gemini-sparkle {
+            display: inline-block;
+            vertical-align: middle;
+            animation: gemini-pulse-spin 2s infinite ease-in-out;
+        }
+
+        @keyframes gemini-pulse-spin {
+            0% {
+                transform: scale(0.85) rotate(0deg);
+                filter: drop-shadow(0 0 2px rgba(66, 133, 244, 0.5));
+            }
+            50% {
+                transform: scale(1.2) rotate(180deg);
+                filter: drop-shadow(0 0 8px rgba(217, 101, 112, 0.8));
+            }
+            100% {
+                transform: scale(0.85) rotate(360deg);
+                filter: drop-shadow(0 0 2px rgba(66, 133, 244, 0.5));
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- แถบแสดงชื่อระบบด้านบนแผนที่ -->
+    <div class="brand-header">
+        <div class="brand-title">
+            <span>🛡️</span> School Safety Analytics
+        </div>
+        <div class="brand-subtitle">ระบบวิเคราะห์ความเสี่ยงสถานศึกษาด้วย AI</div>
+    </div>
+
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
