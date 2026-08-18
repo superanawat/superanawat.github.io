@@ -1,31 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
     <meta charset="utf-8">
+    <!-- Viewport Tag เพื่อรองรับ Responsive บน Mobile และป้องกันการย่อขยายแมพผิดปกติ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Street Food Radar</title>
     
-    <!-- ใช้ CDN สำหรับ Leaflet และ Leaflet Search (ปัญหาเรื่องรูปภาพจะหายไปทันที) -->
+    <!-- ใช้ CDN สำหรับ Leaflet และ Leaflet Search -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-search@3.0.9/dist/leaflet-search.min.css" />
     
     <style>
-        body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100vw; }
-        /* =========================================
-           เพิ่ม CSS สำหรับอนิเมชันนาฬิกาทรายตรงนี้
-           ========================================= */
-        .hourglass-anim {
-            display: inline-block; /* จำเป็นต้องมีเพื่อให้การหมุน (transform) ทำงาน */
-            animation: hourglass-flip 2.5s infinite ease-in-out; /* สั่งให้หมุนวนลูป */
+        * {
+            box-sizing: border-box;
         }
 
-        /* จำลองจังหวะการพลิกของนาฬิกาทราย */
+        html, body { 
+            margin: 0; 
+            padding: 0; 
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        #map { 
+            height: 100vh; 
+            width: 100vw; 
+        }
+
+        /* =========================================
+           อนิเมชันนาฬิกาทราย
+           ========================================= */
+        .hourglass-anim {
+            display: inline-block;
+            animation: hourglass-flip 2.5s infinite ease-in-out;
+        }
+
         @keyframes hourglass-flip {
             0% { transform: rotate(0deg); }
-            40% { transform: rotate(180deg); } /* พลิกกลับหัว */
-            50% { transform: rotate(180deg); } /* หยุดพักให้น้ำทรายไหล */
-            90% { transform: rotate(360deg); } /* พลิกกลับมาตั้งตรง */
-            100% { transform: rotate(360deg); } /* หยุดพัก */
+            40% { transform: rotate(180deg); }
+            50% { transform: rotate(180deg); }
+            90% { transform: rotate(360deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* =========================================
+           ปรับแต่ง Leaflet Popup ให้ Responsive
+           ========================================= */
+        .leaflet-popup-content-wrapper {
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .leaflet-popup-content {
+            margin: 12px 15px;
+            line-height: 1.4;
+            max-width: 280px;
+        }
+
+        /* =========================================
+           ปรับแต่ง Responsive สำหรับอุปกรณ์มือถือ (Mobile)
+           ========================================= */
+        @media (max-width: 600px) {
+            /* ปรับขนาดช่องค้นหาบนมือถือให้ใหญ่ขึ้นและแตะง่ายขึ้น */
+            .leaflet-control-search .search-input {
+                font-size: 14px !important;
+                height: 36px !important;
+                padding: 0 10px !important;
+                width: 180px !important;
+            }
+
+            .leaflet-control-search .search-button {
+                width: 36px !important;
+                height: 36px !important;
+            }
+
+            /* ปรับแต่งเนื้อหา Popup สำหรับหน้าจอเล็ก */
+            .leaflet-popup-content {
+                max-width: 230px;
+                font-size: 13px;
+            }
+
+            .leaflet-popup-content button {
+                width: 100%;
+                padding: 8px 12px !important;
+                font-size: 13px !important;
+            }
+
+            /* ขยับ Control บนแผนที่ให้อยู่ในระยะที่กดสะดวก */
+            .leaflet-touch .leaflet-control-layers, 
+            .leaflet-touch .leaflet-bar {
+                border-width: 1px;
+            }
         }
     </style>
 </head>
