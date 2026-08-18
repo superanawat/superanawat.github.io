@@ -29,3 +29,14 @@ fetch(GAS_URL)
     });
   })
   .catch(error => console.error('เกิดข้อผิดพลาดในการดึงข้อมูล:', error));
+
+
+L.marker([school.lat, school.lng]).addTo(map)
+  .bindPopup(`
+    <b>${school.name}</b><br>
+    ${school.address}<br><br>
+    <button onclick="analyzeSchool('${school.name}', '${school.address}')" 
+            style="background: #4CAF50; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">
+      🤖 วิเคราะห์ทำเล/ข้อมูลด้วย AI
+    </button>
+  `);
