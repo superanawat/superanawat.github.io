@@ -363,7 +363,14 @@ fetch(GAS_URL)
     });
 
     if (schoolMarkers.getLayers().length > 0) {
-      map.fitBounds(schoolMarkers.getBounds(), { padding: [50, 50] });
+      // ดึงข้อมูลหมุดทั้งหมดออกมา
+      const markers = schoolMarkers.getLayers();
+      
+      // สร้างพิกัดขอบเขต (Bounds) จากตำแหน่ง Lat/Lng ของหมุดทุกตัวโดยตรง
+      const bounds = L.latLngBounds(markers.map(marker => marker.getLatLng()));
+      
+      // สั่งให้แผนที่ซูมให้พอดีกับขอบเขต
+      map.fitBounds(bounds, { padding: [50, 50] });
     }
   })
   .catch((error) => console.error('เกิดข้อผิดพลาดในการดึงข้อมูลโรงเรียน:', error));
