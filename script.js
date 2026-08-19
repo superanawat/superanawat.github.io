@@ -206,7 +206,7 @@ function executeComparison() {
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
                         scales: {
                             y: { beginAtZero: true, max: 10, ticks: { font: { size: 11 } } },
                             x: { ticks: { font: { size: 11 } } }
