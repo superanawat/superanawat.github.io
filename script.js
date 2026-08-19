@@ -26,7 +26,7 @@ const GAS_URL =
 const schoolMarkers = L.layerGroup().addTo(map);
 
 // ==========================================
-// ตัวแปรสำหรับระบบเปรียบเทียบ (เพิ่มใหม่)
+// ตัวแปรสำหรับระบบเปรียบเทียบ
 // ==========================================
 let schoolsToCompare = []; // เก็บอ็อบเจ็กต์ข้อมูลโรงเรียนสูงสุด 2 โรงเรียน
 const compareBar = document.getElementById('compareBar');
@@ -41,15 +41,14 @@ const compareResultContent = document.getElementById('compareResultContent');
 function formatAiResponse(text) {
   if (!text) return '';
   return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #0f172a;">$1</strong>')
     .replace(/\n/g, '<br>');
 }
 
 // ==========================================
-// ฟังก์ชันจัดการการเปรียบเทียบโรงเรียน (เพิ่มใหม่)
+// ฟังก์ชันจัดการการเปรียบเทียบโรงเรียน
 // ==========================================
 function addSchoolToCompare(schoolData, buttonElement) {
-    // เช็คว่าเลือกครบ 2 แล้วหรือยัง หรือเลือกซ้ำหรือไม่
     if (schoolsToCompare.length >= 2) {
         alert("คุณเลือกโรงเรียนครบ 2 แห่งแล้ว กรุณากด 'เปรียบเทียบเลย' หรือ 'ยกเลิก' ก่อนเริ่มใหม่");
         return;
@@ -61,15 +60,12 @@ function addSchoolToCompare(schoolData, buttonElement) {
         return;
     }
 
-    // เพิ่มเข้าอาร์เรย์
     schoolsToCompare.push(schoolData);
     
-    // เปลี่ยนสไตล์ปุ่มเพื่อให้รู้ว่าถูกเลือกแล้ว
     buttonElement.innerText = "✅ เลือกเปรียบเทียบแล้ว";
     buttonElement.style.backgroundColor = "#10b981";
     buttonElement.disabled = true;
 
-    // อัปเดตแถบ UI ด้านล่าง
     updateCompareUI();
 }
 
@@ -93,7 +89,6 @@ function cancelComparison() {
     updateCompareUI();
     map.closePopup(); 
 
-    // เพิ่มการรีเซ็ตปุ่มเปรียบเทียบทั้งหมดบนแผนที่
     document.querySelectorAll('.btn-compare-add').forEach(btn => {
         btn.innerText = "⚖️ เลือกเปรียบเทียบ";
         btn.style.backgroundColor = "";
@@ -103,21 +98,15 @@ function cancelComparison() {
 
 function closeModal() {
     compareModalOverlay.style.display = 'none';
-    cancelComparison(); // เมื่อปิดแล้ว ให้เคลียร์คิวด้วย
+    cancelComparison();
 }
 
 // ฟังก์ชันล้างข้อมูลโรงเรียนที่เลือกทั้งหมด
 function clearSelectedSchools() {
-    // 1. ล้างข้อมูลโรงเรียนในอาเรย์เปรียบเทียบ
     schoolsToCompare = [];
-    
-    // 2. อัปเดต UI ของแถบเปรียบเทียบ (ซ่อนแถบและรีเซ็ตข้อความ)
     updateCompareUI();
-    
-    // 3. ปิด Popup บนแผนที่ทั้งหมด
     map.closePopup();
 
-    // 4. รีเซ็ตสถานะปุ่ม "เลือกเปรียบเทียบ" ทุกปุ่มบนแผนที่ให้กลับมาเป็นปกติ
     document.querySelectorAll('.btn-compare-add').forEach(btn => {
         btn.innerText = "⚖️ เลือกเปรียบเทียบ";
         btn.style.backgroundColor = "";
@@ -130,7 +119,6 @@ function clearSelectedSchools() {
 function executeComparison() {
     if (schoolsToCompare.length !== 2) return;
 
-    // เปิด Modal และแสดงสถานะกำลังโหลด
     compareModalOverlay.style.display = 'flex';
     compareResultContent.innerHTML = `<div class="loading-text">⏳ กำลังให้ AI (Ollama) วิเคราะห์เปรียบเทียบ...<br>อาจใช้เวลาประมาณ 10-30 วินาที</div>`;
 
@@ -138,7 +126,7 @@ function executeComparison() {
         method: 'POST',
         headers: { 
             'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true' // ใส่ไว้กัน Ngrok warning
+            'ngrok-skip-browser-warning': 'true'
         },
         body: JSON.stringify({
             school1: {
@@ -155,7 +143,6 @@ function executeComparison() {
     })
     .then(res => res.json())
     .then(data => {
-        // ✅ เช็คว่ามีข้อมูล comparison_result ส่งกลับมาจริงๆ
         if (data && data.comparison_result) {
             const htmlContent = marked.parse(data.comparison_result);
             compareResultContent.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
@@ -180,17 +167,16 @@ fetch(GAS_URL)
         const popupContent = document.createElement('div');
         popupContent.style.padding = '4px';
 
-        // เพิ่มปุ่ม "เปรียบเทียบ" เข้าไปใน Popup
         popupContent.innerHTML = `
           <div style="margin-bottom: 8px;">
             <b style="font-size: 14px; color: #0f172a;">${school.name}</b><br>
             <small style="color: #64748b;">${school.address}</small>
           </div>
-          <button class="btn-analyze" style="width: 100%; background: #2563eb; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 12px; font-weight: 600; transition: background 0.2s;">
+          <button class="btn-analyze" style="width: 100%; background: #2563eb; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 6px; font-size: 12px; font-weight: 600; transition: background 0.2s; margin-bottom: 6px;">
             🤖 ให้ AI วิเคราะห์โรงเรียนนี้
           </button>
           
-          <button class="btn-compare-add">
+          <button class="btn-compare-add" style="width: 100%; background: #475569; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 6px; font-size: 12px; font-weight: 600;">
             ⚖️ เลือกเปรียบเทียบ
           </button>
 
@@ -201,7 +187,6 @@ fetch(GAS_URL)
         const compareBtn = popupContent.querySelector('.btn-compare-add');
         const aiBox = popupContent.querySelector('.ai-box');
 
-        // จัดการเหตุการณ์เมื่อกดปุ่ม "เลือกเปรียบเทียบ"
         compareBtn.addEventListener('click', () => {
             const schoolData = {
                 name: school.name,
@@ -211,11 +196,10 @@ fetch(GAS_URL)
             addSchoolToCompare(schoolData, compareBtn);
         });
 
-        // จัดการเหตุการณ์เมื่อกดปุ่ม "ให้ AI วิเคราะห์โรงเรียนนี้"
         analyzeBtn.addEventListener('click', () => {
           aiBox.innerHTML = `
-            <div style="padding: 10px; text-align: center; color: #4f46e5; font-weight: 500;">
-              <svg class="gemini-sparkle" viewBox="0 0 24 24" width="20" height="20" fill="none" style="margin-right: 6px;">
+            <div style="padding: 12px; text-align: center; color: #4f46e5; font-weight: 500;">
+              <svg class="gemini-sparkle" viewBox="0 0 24 24" width="20" height="20" fill="none" style="margin-right: 6px; vertical-align: middle;">
                 <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" fill="url(#gemini-grad)"/>
                 <defs>
                   <linearGradient id="gemini-grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -258,9 +242,9 @@ fetch(GAS_URL)
                 data.breakdown.forEach((item, index) => {
                   breakdownRowsHtml += `
                     <tr style="border-bottom: 1px dashed #e2e8f0;">
-                      <td style="padding: 4px;">${index + 1}. ${item.title}<br><span style="color: #64748b;">${item.subtitle}</span></td>
-                      <td style="padding: 4px;"><span class="value-pill">${item.weight_label}</span></td>
-                      <td style="padding: 4px; color: #dc2626; font-weight: 600;">+${item.score_added}</td>
+                      <td style="padding: 6px 4px;">${index + 1}. ${item.title}<br><span style="color: #64748b; font-size: 10px;">${item.subtitle}</span></td>
+                      <td style="padding: 6px 4px; text-align: center;"><span style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 10px;">${item.weight_label}</span></td>
+                      <td style="padding: 6px 4px; color: #dc2626; font-weight: 600; text-align: right;">+${item.score_added}</td>
                     </tr>
                   `;
                   scoresList.push(item.score_added);
@@ -269,35 +253,35 @@ fetch(GAS_URL)
                 scorePartsString = scoresList.join(' + ');
               }
         
-              // แสดงผลแบบแนวนอน (แบ่ง 2 คอลัมน์ ซ้าย-ขวา) ภายใน scope เดียวกัน ป้องกันปัญหา ReferenceError
+              // โครงสร้าง Responsive แบบ Flexbox (flex-wrap: wrap) ป้องกันหน้าจอเบียดและจัดระเบียบให้สวยงาม
               aiBox.innerHTML = `
-                <div style="display: flex; gap: 16px; align-items: flex-start; border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 10px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; border-top: 1px solid #cbd5e1; padding-top: 12px; margin-top: 10px;">
                   
-                  <!-- ฝั่งซ้าย: ผลวิเคราะห์ AI -->
-                  <div style="flex: 1; min-width: 0; font-size: 12px; color: #334155;">
+                  <!-- ฝั่งซ้าย: ผลวิเคราะห์ AI (ยืดหยุ่น กำหนดความกว้างขั้นต่ำเพื่อให้แสดงผลสวยงาม) -->
+                  <div style="flex: 1 1 260px; min-width: 0; font-size: 11.5px; color: #334155; line-height: 1.6;">
                     ${formattedResult}
                   </div>
         
-                  <!-- ฝั่งขวา: ตารางรายละเอียดคะแนน -->
-                  <div style="flex: 1; min-width: 0;">
+                  <!-- ฝั่งขวา: ตารางรายละเอียดคะแนน (จะสลับลงมาด้านล่างอัตโนมัติหากหน้าจอ/พื้นที่ Popup แคบเกินไป) -->
+                  <div style="flex: 1 1 220px; min-width: 0;">
                     <details class="calc-details" open style="margin-top: 0;">
                       <summary style="cursor: pointer; font-weight: 600; color: #1e293b; background: #f1f5f9; padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 11px;">
                         🔍 รายละเอียดคะแนน (${score}/10)
                       </summary>
                       <div class="calc-body" style="padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 6px 6px;">
-                        <table class="weight-table" style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                        <table class="weight-table" style="width: 100%; border-collapse: collapse; font-size: 10.5px;">
                           <thead>
-                            <tr style="border-bottom: 1px solid #cbd5e1; text-align: left;">
-                              <th style="padding: 3px;">ปัจจัย</th>
-                              <th style="padding: 3px;">น้ำหนัก</th>
-                              <th style="padding: 3px;">คะแนน</th>
+                            <tr style="border-bottom: 1px solid #cbd5e1; text-align: left; color: #475569;">
+                              <th style="padding: 4px;">ปัจจัย</th>
+                              <th style="padding: 4px; text-align: center;">น้ำหนัก</th>
+                              <th style="padding: 4px; text-align: right;">คะแนน</th>
                             </tr>
                           </thead>
                           <tbody>
                             ${breakdownRowsHtml}
                           </tbody>
                         </table>
-                        <div class="total-box" style="margin-top: 6px; padding: 6px; background: #fef2f2; border-left: 3px solid #ef4444; border-radius: 4px; color: #991b1b; font-size: 10px;">
+                        <div class="total-box" style="margin-top: 8px; padding: 8px; background: #fef2f2; border-left: 3px solid #ef4444; border-radius: 4px; color: #991b1b; font-size: 10.5px; line-height: 1.4;">
                           <strong>รวม:</strong> ${scorePartsString} = <strong>${sumScore100.toFixed(1)} / 100</strong><br>
                           สเกล 10 = <strong>${score} / 10</strong> ${icons}
                         </div>
@@ -309,13 +293,12 @@ fetch(GAS_URL)
               `;
             })
             .catch((err) => {
-              aiBox.innerHTML = '<div style="color: #dc2626; text-align: center;">❌ เกิดข้อผิดพลาดในการเชื่อมต่อ AI</div>';
+              aiBox.innerHTML = '<div style="color: #dc2626; text-align: center; padding: 10px;">❌ เกิดข้อผิดพลาดในการเชื่อมต่อ AI</div>';
               analyzeBtn.style.display = 'block';
               console.error(err);
             });
         });
 
-        // สร้าง Marker บนแผนที่
         const marker = L.marker([school.lat, school.lng], {
           title: school.name,
         }).bindPopup(popupContent);
