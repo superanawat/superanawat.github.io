@@ -11,6 +11,34 @@
 
     <!-- 🟢 สิ่งที่ต้องเพิ่ม: CDN สำหรับ Marked.js 🟢 -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        function clearSelectedSchools() {
+        // 1. ล้างตัวแปรเก็บข้อมูลโรงเรียนที่เลือกไว้ (ปรับชื่อตัวแปรตามโค้ดจริงของคุณ เช่น school1, school2)
+        selectedSchool1 = null;
+        selectedSchool2 = null;
+    
+        // 2. ล้างค่าช่องข้อความ (Input) หรือ Dropdown ค้นหาโรงเรียน (ตรวจสอบว่ามี element นี้จริงหรือไม่)
+        const s1Input = document.getElementById('school1Input');
+        if (s1Input) s1Input.value = '';
+        const s2Input = document.getElementById('school2Input');
+        if (s2Input) s2Input.value = '';
+    
+        // 3. ซ่อนหรือเคลียร์ตารางผลลัพธ์ / Pop-up เก่าออก
+        const comparisonResultDiv = document.getElementById('comparisonResult');
+        if (comparisonResultDiv) {
+            comparisonResultDiv.innerHTML = '';
+            comparisonResultDiv.style.display = 'none';
+        }
+
+        // ซ่อนแถบ Compare Bar และรีเซ็ตสถานะการเลือกเปรียบเทียบในระบบ (ถ้ามีฟังก์ชัน cancelComparison)
+        if (typeof cancelComparison === 'function') {
+            cancelComparison();
+        }
+    
+        // (ทางเลือก) รีเซ็ตตารางเปรียบเทียบในหน้าจอให้กลับเป็นค่าว่าง
+        console.log("ล้างข้อมูลโรงเรียนที่เลือกเรียบร้อยแล้ว พร้อมเลือกใหม่");
+    }
+    </script>
     
     <style>
         * {
@@ -33,8 +61,8 @@
         }
 
         /* =========================================
-           ปรับแต่ง Leaflet Popup ให้กว้างและสวยงามขึ้น
-           ========================================= */
+            ปรับแต่ง Leaflet Popup ให้กว้างและสวยงามขึ้น
+            ========================================= */
         .leaflet-popup-content-wrapper {
             border-radius: 12px;
             padding: 0;
@@ -51,8 +79,8 @@
         }
 
         /* =========================================
-           องค์ประกอบ UI การประเมินความเสี่ยง
-           ========================================= */
+            องค์ประกอบ UI การประเมินความเสี่ยง
+            ========================================= */
         .risk-card {
             padding: 16px;
             background: #ffffff;
@@ -185,8 +213,8 @@
             }
         }
         /* =========================================
-           1. สไตล์สำหรับ Floating Brand Header
-           ========================================= */
+            1. สไตล์สำหรับ Floating Brand Header
+            ========================================= */
         .brand-header {
             position: absolute;
             top: 12px;
@@ -194,10 +222,18 @@
             z-index: 1000;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
-            padding: 8px 14px;
+            padding: 10px 14px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .brand-info-group {
+            display: flex;
+            flex-direction: column;
         }
 
         .brand-title {
@@ -215,9 +251,30 @@
             margin-top: 1px;
         }
 
+        /* ปรับสไตล์ปุ่มล้างข้อมูลให้อยู่ใน Header อย่างสวยงาม */
+        .btn-clear-selection {
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-clear-selection:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+        }
+
         /* =========================================
-           2. อนิเมชันไอคอน Gemini Sparkle
-           ========================================= */
+            2. อนิเมชันไอคอน Gemini Sparkle
+            ========================================= */
         .gemini-sparkle {
             display: inline-block;
             vertical-align: middle;
@@ -239,8 +296,8 @@
             }
         }
     /* =========================================
-           ส่วนที่เพิ่มใหม่: โหมดเปรียบเทียบ (Compare Mode)
-           ========================================= */
+            ส่วนที่เพิ่มใหม่: โหมดเปรียบเทียบ (Compare Mode)
+            ========================================= */
 
         /* ปุ่มเปรียบเทียบใน Popup ของโรงเรียน */
         .btn-compare-add {
@@ -312,10 +369,15 @@
 <body>
     <!-- แถบแสดงชื่อระบบด้านบนแผนที่ -->
     <div class="brand-header">
-        <div class="brand-title">
-            <span>🛡️</span> School Safety Analytics
+        <div class="brand-info-group">
+            <div class="brand-title">
+                <span>🛡️</span> School Safety Analytics
+            </div>
+            <div class="brand-subtitle">ระบบวิเคราะห์ความเสี่ยงสถานศึกษาด้วย AI</div>
         </div>
-        <div class="brand-subtitle">ระบบวิเคราะห์ความเสี่ยงสถานศึกษาด้วย AI</div>
+        <button id="clearBtn" onclick="clearSelectedSchools()" class="btn-clear-selection">
+            🔄 ล้างข้อมูล / เลือกโรงเรียนใหม่
+        </button>
     </div>
 
     <div id="map"></div>
