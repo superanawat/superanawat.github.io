@@ -87,11 +87,18 @@ function updateCompareUI() {
     }
 }
 
+// ฟังก์ชันยกเลิกการเปรียบเทียบ
 function cancelComparison() {
     schoolsToCompare = [];
     updateCompareUI();
-    // ปิด Popup ทุกอัน เพื่อรีเซ็ตสถานะปุ่ม (Leaflet จะรีเซ็ต DOM ข้างในให้เมื่อเราเปิดใหม่)
     map.closePopup(); 
+
+    // เพิ่มการรีเซ็ตปุ่มเปรียบเทียบทั้งหมดบนแผนที่
+    document.querySelectorAll('.btn-compare-add').forEach(btn => {
+        btn.innerText = "⚖️ เลือกเปรียบเทียบ";
+        btn.style.backgroundColor = "";
+        btn.disabled = false;
+    });
 }
 
 function closeModal() {
@@ -107,12 +114,18 @@ function clearSelectedSchools() {
     // 2. อัปเดต UI ของแถบเปรียบเทียบ (ซ่อนแถบและรีเซ็ตข้อความ)
     updateCompareUI();
     
-    // 3. ปิด Popup บนแผนที่ทั้งหมด เพื่อรีเซ็ตสถานะปุ่ม "เลือกเปรียบเทียบ" กลับเป็นปกติ
+    // 3. ปิด Popup บนแผนที่ทั้งหมด
     map.closePopup();
+
+    // 4. รีเซ็ตสถานะปุ่ม "เลือกเปรียบเทียบ" ทุกปุ่มบนแผนที่ให้กลับมาเป็นปกติ
+    document.querySelectorAll('.btn-compare-add').forEach(btn => {
+        btn.innerText = "⚖️ เลือกเปรียบเทียบ";
+        btn.style.backgroundColor = "";
+        btn.disabled = false;
+    });
 
     console.log("ล้างข้อมูลโรงเรียนที่เลือกเรียบร้อยแล้ว พร้อมเลือกใหม่");
 }
-
 function executeComparison() {
     if (schoolsToCompare.length !== 2) return;
 
