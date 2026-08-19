@@ -235,6 +235,75 @@
                 filter: drop-shadow(0 0 2px rgba(66, 133, 244, 0.5));
             }
         }
+    /* =========================================
+           ส่วนที่เพิ่มใหม่: โหมดเปรียบเทียบ (Compare Mode)
+           ========================================= */
+
+        /* ปุ่มเปรียบเทียบใน Popup ของโรงเรียน */
+        .btn-compare-add {
+            width: 100%;
+            margin-top: 12px;
+            padding: 8px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-compare-add:hover { background-color: #2563eb; }
+
+        /* แถบแจ้งเตือนด้านล่างเมื่อเลือกโรงเรียนแล้ว */
+        .compare-bar {
+            position: absolute;
+            bottom: -100px; /* ซ่อนไว้ก่อน */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: bottom 0.3s ease;
+        }
+        .compare-bar.show { bottom: 0; }
+        .compare-text { font-size: 14px; font-weight: 600; color: #1e293b; }
+        .btn-compare-exec {
+            background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+        .btn-compare-cancel {
+            background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;
+        }
+
+        /* Modal สำหรับแสดงผลการเปรียบเทียบ */
+        .compare-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .compare-modal {
+            background: white; width: 90%; max-width: 800px; max-height: 90vh;
+            border-radius: 12px; padding: 24px; overflow-y: auto;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute; top: 12px; right: 16px; font-size: 24px; cursor: pointer; color: #64748b;
+        }
+
+        /* สไตล์ตาราง Markdown ที่ถูกแปลง */
+        .markdown-content table {
+            width: 100%; border-collapse: collapse; margin-top: 16px;
+        }
+        .markdown-content th, .markdown-content td {
+            border: 1px solid #e2e8f0; padding: 10px; text-align: left;
+        }
+        .markdown-content th { background-color: #f8fafc; font-weight: bold; }
+        
+        .loading-text { text-align: center; font-weight: bold; color: #3b82f6; padding: 20px; }
     </style>
 </head>
 <body>
@@ -248,6 +317,24 @@
 
     <div id="map"></div>
 
+    <!-- แถบด้านล่างสำหรับบอกสถานะการเลือกโรงเรียนเพื่อเปรียบเทียบ -->
+    <div id="compareBar" class="compare-bar">
+        <span class="compare-text" id="compareStatusText">เลือกโรงเรียนที่ 1 แล้ว... กรุณาเลือกอีก 1 แห่ง</span>
+        <button class="btn-compare-exec" id="btnCompareExec" style="display: none;" onclick="executeComparison()">เปรียบเทียบเลย</button>
+        <button class="btn-compare-cancel" onclick="cancelComparison()">ยกเลิก</button>
+    </div>
+
+    <!-- Modal แสดงผลตารางเปรียบเทียบ -->
+    <div id="compareModalOverlay" class="compare-modal-overlay">
+        <div class="compare-modal">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h2 style="margin-top:0; color:#0f172a;">📊 ผลการเปรียบเทียบความเสี่ยง</h2>
+            <div id="compareResultContent">
+                <!-- เนื้อหาจะถูกแทรกที่นี่ -->
+            </div>
+        </div>
+    </div>
+    
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-search@3.0.9/dist/leaflet-search.min.js"></script>
     <script src="script.js"></script>
