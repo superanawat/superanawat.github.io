@@ -41,51 +41,64 @@
             console.log("ล้างข้อมูลโรงเรียนที่เลือกเรียบร้อยแล้ว พร้อมเลือกใหม่");
         }
 
-            function exportToPDF() {
-                const element = document.getElementById('compareResultContent');
-                const modal = document.querySelector('.compare-modal');
-                const overlay = document.querySelector('.compare-modal-overlay');
+        async function exportToPDF() {
+            const source = document.getElementById('compareResultContent');
             
-                // 1. เก็บค่าสไตล์เดิมไว้
-                const originalModalMaxHeight = modal.style.maxHeight;
-                const originalModalOverflow = modal.style.overflow;
-                const originalModalWidth = modal.style.width;
-                const originalElementWidth = element.style.width;
+            // 1. สร้าง Container ชั่วคราวไว้นอกหน้าจอ เพื่อให้ความสูงไหลได้อิสระ ไม่โดน Modal บล็อก
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px';
+            tempContainer.style.top = '0';
+            tempContainer.style.width = '750px'; // ขนาดความกว้างพอดีกระดาษ A4
+            tempContainer.style.background = '#ffffff';
+            tempContainer.style.padding = '20px';
             
-                // 2. ปรับขนาดชั่วคราวให้เท่ากับ A4 (ประมาณ 794px) เพื่อไม่ให้ขอบโดนตัด
-                modal.style.maxHeight = 'none';
-                modal.style.overflow = 'visible';
-                modal.style.width = '794px';
-                element.style.width = '100%';
-                overlay.style.overflow = 'visible';
+            // 2. คัดลอก (Clone) เนื้อหาทั้งหมดมาใส่ใน Container ชั่วคราว
+            const clone = source.cloneNode(true);
             
-                // 3. กำหนดค่า Option สำหรับ html2pdf
-                const opt = {
-                    margin:       [10, 10, 10, 10],
-                    filename:     'School_Safety_Comparison_Report.pdf',
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { 
-                        scale: 2, 
-                        useCORS: true,
-                        scrollY: 0,
-                        scrollX: 0
-                    },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak:    { mode: ['css', 'legacy'] }
-                };
+            // 3. แปลง <canvas> ของ Chart.js ให้กลายเป็น <img> PNG (แก้ปัญหากราฟหาย/ตัดขาดตอน Clone)
+            const origCanvases = source.querySelectorAll('canvas');
+            const cloneCanvases = clone.querySelectorAll('canvas');
             
-                // 4. หน่วงเวลา 300ms ให้ DOM คำนวณขนาดใหม่ แล้วจึงสร้าง PDF
-                setTimeout(() => {
-                    html2pdf().set(opt).from(element).save().then(() => {
-                        // 5. คืนค่า สไตล์เดิมกลับมาเมื่อดาวน์โหลดเสร็จ
-                        modal.style.maxHeight = originalModalMaxHeight;
-                        modal.style.overflow = originalModalOverflow;
-                        modal.style.width = originalModalWidth;
-                        element.style.width = originalElementWidth;
-                        overlay.style.overflow = 'hidden';
-                    });
-                }, 300);
+            origCanvases.forEach((origCanvas, index) => {
+                const img = document.createElement('img');
+                img.src = origCanvas.toDataURL('image/png');
+                img.style.width = '100%';
+                img.style.height = 'auto';
+                img.style.display = 'block';
+                
+                if (cloneCanvases[index]) {
+                    cloneCanvases[index].parentNode.replaceChild(img, cloneCanvases[index]);
+                }
+            });
+        
+            tempContainer.appendChild(clone);
+            document.body.appendChild(tempContainer);
+        
+            // 4. ตั้งค่า html2pdf สำหรับการตัดหน้าให้อัตโนมัติ
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     'School_Safety_Comparison_Report.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true,
+                    logging: false
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['css', 'legacy'] } // บังคับขึ้นหน้าใหม่อัตโนมัติเมื่อเนื้อหายาวเกินหน้า A4
+            };
+        
+            try {
+                // 5. สั่งสร้าง PDF จาก Container ชั่วคราว
+                await html2pdf().set(opt).from(tempContainer).save();
+            } catch (error) {
+                console.error("Export PDF Error:", error);
+            } finally {
+                // 6. ลบ Container ชั่วคราวทิ้งทันทีเมื่อทำเสร็จ
+                document.body.removeChild(tempContainer);
             }
+        }
     </script>
     
     <style>
