@@ -54,20 +54,98 @@
             box-sizing: border-box;
         }
 
+        /* ปรับเลย์เอาต์หลักเป็น Grid 2 คอลัมน์ (ซ้าย: แผนที่, ขวา: ข้อมูลประกอบ) */
         html, body { 
             margin: 0; 
             padding: 0; 
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: var(--academic-bg);
             color: var(--academic-secondary);
+            display: grid;
+            grid-template-columns: 1fr 420px;
+        }
+
+        /* ฝั่งซ้าย: กล่องบรรจุแผนที่ */
+        .map-section {
+            position: relative;
+            width: 100%;
+            height: 100vh;
         }
 
         #map { 
-            height: 100vh; 
-            width: 100vw; 
+            height: 100%; 
+            width: 100%; 
+        }
+
+        /* ฝั่งขวา: แผงข้อมูลประกอบ (Sidebar Panel) ในโทนวิชาการ */
+        .sidebar-panel {
+            background: #ffffff;
+            border-left: 1px solid var(--academic-border);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: -4px 0 20px rgba(15, 23, 42, 0.04);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--academic-border);
+            border-left: 4px solid var(--academic-primary);
+        }
+
+        .sidebar-header h3 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            color: var(--academic-primary);
+            font-weight: 700;
+        }
+
+        .sidebar-header p {
+            margin: 0;
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .sidebar-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            border: 1px solid var(--academic-border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .info-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: var(--academic-secondary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-card ul {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .info-card li {
+            margin-bottom: 6px;
         }
 
         /* =========================================
@@ -83,8 +161,8 @@
 
         .leaflet-popup-content {
             margin: 0 !important;
-            width: 650px !important;
-            max-width: 95vw;
+            width: 600px !important;
+            max-width: 90vw;
             line-height: 1.6;
             color: var(--academic-secondary);
         }
@@ -94,12 +172,7 @@
             gap: 16px;
             align-items: flex-start;
         }
-        .popup-col-left {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .popup-col-right {
+        .popup-col-left, .popup-col-right {
             flex: 1;
             min-width: 0;
         }
@@ -108,7 +181,7 @@
             องค์ประกอบ UI การประเมินความเสี่ยง
             ========================================= */
         .risk-card {
-            padding: 18px;
+            padding: 16px;
             background: #ffffff;
         }
 
@@ -122,20 +195,19 @@
         }
 
         .risk-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--academic-primary);
             margin: 0;
-            letter-spacing: -0.2px;
         }
 
         .risk-score-badge {
             background: #fef2f2;
             color: #dc2626;
             border: 1px solid #fca5a5;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -144,10 +216,9 @@
 
         .score-dots {
             letter-spacing: 1px;
-            font-size: 11px;
+            font-size: 10px;
         }
 
-        /* กล่อง Accordion รายละเอียดการคำนวณ */
         .calc-details {
             background: #f8fafc;
             border: 1px solid var(--academic-border);
@@ -157,56 +228,45 @@
         }
 
         .calc-details summary {
-            padding: 10px 12px;
-            font-size: 13px;
+            padding: 8px 12px;
+            font-size: 12px;
             font-weight: 600;
             color: #1e293b;
             cursor: pointer;
             user-select: none;
             background: #f1f5f9;
-            transition: background 0.2s;
             border-left: 3px solid var(--academic-primary);
         }
 
-        .calc-details summary:hover {
-            background: #e2e8f0;
-        }
-
         .calc-body {
-            padding: 12px;
-            font-size: 12px;
+            padding: 10px;
+            font-size: 11px;
         }
 
-        /* ตารางแสดงการถ่วงน้ำหนักสไตล์รายงานวิชาการ */
         .weight-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 6px;
+            margin-top: 4px;
         }
 
         .weight-table th, .weight-table td {
             text-align: left;
-            padding: 7px 6px;
+            padding: 6px;
             border-bottom: 1px solid #e2e8f0;
         }
 
         .weight-table th {
             color: #475569;
             font-weight: 600;
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
             background-color: #f8fafc;
-        }
-
-        .weight-table tr:last-child td {
-            border-bottom: none;
         }
 
         .value-pill {
             background: #eff6ff;
             color: #1d4ed8;
-            padding: 2px 6px;
+            padding: 2px 5px;
             border-radius: 4px;
             font-weight: 600;
             font-size: 11px;
@@ -218,50 +278,34 @@
             color: #dc2626;
         }
 
-        .calc-formula {
-            color: #64748b;
-            font-size: 11px;
-            margin-top: 2px;
-        }
-
         .total-box {
-            margin-top: 10px;
-            padding: 10px;
+            margin-top: 8px;
+            padding: 8px;
             background: #fef2f2;
             border-radius: 6px;
             border-left: 3px solid #dc2626;
-            font-size: 12px;
+            font-size: 11px;
             color: #991b1b;
             font-weight: 500;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 600px) {
-            .leaflet-popup-content {
-                width: 290px !important;
-            }
-            .weight-table {
-                font-size: 11px;
-            }
-        }
-
         /* =========================================
-            Floating Brand Header (สไตล์กระดาษรายงานวิชาการ)
+            Floating Brand Header (อยู่ภายในกรอบแผนที่ฝั่งซ้าย)
             ========================================= */
         .brand-header {
             position: absolute;
             top: 16px;
-            left: 60px;
+            left: 16px;
             z-index: 1000;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(8px);
-            padding: 12px 18px;
+            padding: 12px 16px;
             border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08);
             border: 1px solid var(--academic-border);
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             border-left: 4px solid var(--academic-primary);
         }
 
@@ -271,13 +315,12 @@
         }
 
         .brand-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--academic-primary);
             display: flex;
             align-items: center;
             gap: 6px;
-            letter-spacing: -0.2px;
         }
 
         .brand-subtitle {
@@ -291,9 +334,9 @@
             background-color: #f1f5f9;
             color: #334155;
             border: 1px solid #cbd5e1;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -305,7 +348,6 @@
         .btn-clear-selection:hover {
             background-color: #e2e8f0;
             color: var(--academic-primary);
-            border-color: #94a3b8;
         }
 
         /* =========================================
@@ -318,18 +360,9 @@
         }
 
         @keyframes gemini-pulse-spin {
-            0% {
-                transform: scale(0.85) rotate(0deg);
-                filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.4));
-            }
-            50% {
-                transform: scale(1.2) rotate(180deg);
-                filter: drop-shadow(0 0 6px rgba(29, 78, 216, 0.6));
-            }
-            100% {
-                transform: scale(0.85) rotate(360deg);
-                filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.4));
-            }
+            0% { transform: scale(0.85) rotate(0deg); filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.4)); }
+            50% { transform: scale(1.2) rotate(180deg); filter: drop-shadow(0 0 6px rgba(29, 78, 216, 0.6)); }
+            100% { transform: scale(0.85) rotate(360deg); filter: drop-shadow(0 0 2px rgba(37, 99, 235, 0.4)); }
         }
 
         /* =========================================
@@ -337,16 +370,16 @@
             ========================================= */
         .btn-compare-add {
             width: 100%;
-            margin-top: 12px;
-            padding: 8px;
+            margin-top: 10px;
+            padding: 7px;
             background-color: var(--academic-primary);
             color: white;
             border: none;
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
+            font-size: 12px;
             transition: background 0.2s;
-            font-size: 13px;
         }
         .btn-compare-add:hover { background-color: #1e40af; }
 
@@ -357,28 +390,26 @@
             transform: translateX(-50%);
             z-index: 1000;
             background: white;
-            padding: 14px 24px;
+            padding: 12px 20px;
             border-radius: 8px 8px 0 0;
             box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.1);
             border: 1px solid var(--academic-border);
             border-bottom: none;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             transition: bottom 0.3s ease;
         }
         .compare-bar.show { bottom: 0; }
-        .compare-text { font-size: 13px; font-weight: 600; color: var(--academic-secondary); }
+        .compare-text { font-size: 12px; font-weight: 600; color: var(--academic-secondary); }
         
         .btn-compare-exec {
-            background: #059669; color: white; border: none; padding: 7px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12px;
-            transition: background 0.2s;
+            background: #059669; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 11px;
         }
         .btn-compare-exec:hover { background: #047857; }
 
         .btn-compare-cancel {
-            background: #ef4444; color: white; border: none; padding: 7px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 12px;
-            transition: background 0.2s;
+            background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 11px;
         }
         .btn-compare-cancel:hover { background: #dc2626; }
 
@@ -390,59 +421,96 @@
         }
         .compare-modal {
             background: white; width: 90%; max-width: 850px; max-height: 90vh;
-            border-radius: 10px; padding: 28px; overflow-y: auto;
+            border-radius: 10px; padding: 24px; overflow-y: auto;
             position: relative;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--academic-border);
         }
         .close-modal {
-            position: absolute; top: 16px; right: 20px; font-size: 24px; cursor: pointer; color: #64748b;
-            transition: color 0.2s;
+            position: absolute; top: 14px; right: 18px; font-size: 22px; cursor: pointer; color: #64748b;
         }
         .close-modal:hover { color: var(--academic-secondary); }
 
-        /* สไตล์ตาราง Markdown ที่ถูกแปลงให้ออกมาเหมือนเอกสารงานวิจัย */
         .markdown-content table {
-            width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px;
+            width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px;
         }
         .markdown-content th, .markdown-content td {
-            border: 1px solid #cbd5e1; padding: 10px 12px; text-align: left;
+            border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left;
         }
         .markdown-content th { background-color: #f1f5f9; color: var(--academic-primary); font-weight: 700; }
-        .markdown-content tr:nth-child(even) { background-color: #f8fafc; }
         
-        .loading-text { text-align: center; font-weight: 600; color: var(--academic-primary); padding: 24px; font-size: 14px; }
+        .loading-text { text-align: center; font-weight: 600; color: var(--academic-primary); padding: 20px; font-size: 13px; }
+
+        /* Responsive สำหรับจอขนาดเล็ก (Tablet/Mobile) ให้เรียงลงมาแทน */
+        @media (max-width: 900px) {
+            html, body {
+                grid-template-columns: 1fr;
+                grid-template-rows: 60vh 40vh;
+                overflow: auto;
+            }
+            .sidebar-panel {
+                height: auto;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- แถบแสดงชื่อระบบด้านบนแผนที่ (Academic Header) -->
-    <div class="brand-header">
-        <div class="brand-info-group">
-            <div class="brand-title">
-                <span>🛡️</span> School Safety Analytics
+    <!-- ฝั่งซ้าย: ส่วนของแผนที่และเครื่องมือควบคุม -->
+    <div class="map-section">
+        <!-- แถบแสดงชื่อระบบ (Floating Brand Header) -->
+        <div class="brand-header">
+            <div class="brand-info-group">
+                <div class="brand-title">
+                    <span>🛡️</span> School Safety Analytics
+                </div>
+                <div class="brand-subtitle">ระบบวิเคราะห์ความเสี่ยงสถานศึกษาด้วย AI</div>
             </div>
-            <div class="brand-subtitle">ระบบวิเคราะห์ความเสี่ยงสถานศึกษาเชิงพื้นที่ด้วยปัญญาประดิษฐ์</div>
+            <button id="clearBtn" onclick="clearSelectedSchools()" class="btn-clear-selection">
+                🔄 รีเซ็ตข้อมูลการเลือก
+            </button>
         </div>
-        <button id="clearBtn" onclick="clearSelectedSchools()" class="btn-clear-selection">
-            🔄 รีเซ็ตข้อมูลการเลือก
-        </button>
+
+        <!-- แผนที่หลัก -->
+        <div id="map"></div>
+
+        <!-- แถบด้านล่างสำหรับบอกสถานะการเลือกโรงเรียนเพื่อเปรียบเทียบ -->
+        <div id="compareBar" class="compare-bar">
+            <span class="compare-text" id="compareStatusText">เลือกโรงเรียนที่ 1 แล้ว... กรุณาเลือกอีก 1 แห่ง</span>
+            <button class="btn-compare-exec" id="btnCompareExec" style="display: none;" onclick="executeComparison()">ประมวลผลเปรียบเทียบ</button>
+            <button class="btn-compare-cancel" onclick="cancelComparison()">ยกเลิก</button>
+        </div>
     </div>
 
-    <!-- แผนที่หลัก -->
-    <div id="map"></div>
-
-    <!-- แถบด้านล่างสำหรับบอกสถานะการเลือกโรงเรียนเพื่อเปรียบเทียบ -->
-    <div id="compareBar" class="compare-bar">
-        <span class="compare-text" id="compareStatusText">เลือกโรงเรียนที่ 1 แล้ว... กรุณาเลือกอีก 1 แห่ง</span>
-        <button class="btn-compare-exec" id="btnCompareExec" style="display: none;" onclick="executeComparison()">ประมวลผลเปรียบเทียบ</button>
-        <button class="btn-compare-cancel" onclick="cancelComparison()">ยกเลิก</button>
+    <!-- ฝั่งขวา: แผงข้อมูลประกอบ (Sidebar Panel) -->
+    <div class="sidebar-panel">
+        <div class="sidebar-header">
+            <h3>📌 แผงข้อมูลและคำแนะนำระบบ</h3>
+            <p>รายงานการประเมินเชิงพื้นที่สถาบันการศึกษา</p>
+        </div>
+        <div class="sidebar-body">
+            <div class="info-card">
+                <h4>🎯 วิธีใช้งานระบบ</h4>
+                <ul>
+                    <li>คลิกหมุดโรงเรียนบนแผนที่เพื่อเปิดหน้าต่างแสดงคะแนนความเสี่ยงเชิงลึก</li>
+                    <li>ตรวจสอบรายละเอียดปัจจัยถ่วงน้ำหนักและผลวิเคราะห์จากปัญญาประดิษฐ์</li>
+                    <li>กดปุ่ม <strong>"เพิ่มเพื่อเปรียบเทียบ"</strong> ใน Popup เพื่อวิเคราะห์เปรียบเทียบสถานศึกษา 2 แห่งแบบคู่ขนาน</li>
+                </ul>
+            </div>
+            
+            <div class="info-card" id="supplementaryInfo">
+                <h4>📊 ข้อมูลสรุปเชิงสถิติ</h4>
+                <p style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                    ระบบทำการคำนวณระดับความเสี่ยงตามเกณฑ์ความหนาแน่นและโครงสร้างประชากรรายพื้นที่โดยอัตโนมัติ
+                </p>
+            </div>
+        </div>
     </div>
 
     <!-- Modal แสดงผลตารางเปรียบเทียบ -->
     <div id="compareModalOverlay" class="compare-modal-overlay">
         <div class="compare-modal">
             <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2 style="margin-top:0; color:var(--academic-primary); font-size: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px;">📊 รายงานผลการเปรียบเทียบความเสี่ยงสถานศึกษา</h2>
+            <h2 style="margin-top:0; color:var(--academic-primary); font-size: 18px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">📊 รายงานผลการเปรียบเทียบความเสี่ยงสถานศึกษา</h2>
             <div id="compareResultContent">
                 <!-- เนื้อหาจะถูกแทรกที่นี่ -->
             </div>
