@@ -43,9 +43,21 @@
 
         // ฟังก์ชันสำหรับส่งออกและดาวน์โหลดเนื้อหาใน Modal เป็นไฟล์ PDF
         function exportToPDF() {
+            // 1. เลือก Element หลัก
             const element = document.getElementById('compareResultContent');
+            const modal = document.querySelector('.compare-modal');
+            const overlay = document.querySelector('.compare-modal-overlay');
+        
+            // 2. ปรับสไตล์เพื่อบังคับให้ทุกอย่าง "กางออก" เต็มที่
+            // บังคับให้ Modal และ overlay เลิกจำกัดความสูง
+            const originalModalStyles = { maxHeight: modal.style.maxHeight, overflow: modal.style.overflow };
+            const originalOverlayStyles = { position: overlay.style.position, overflow: overlay.style.overflow };
+        
+            modal.style.maxHeight = 'none';
+            modal.style.overflow = 'visible';
+            overlay.style.overflow = 'visible';
             
-            // ตั้งค่าตัวเลือกโดยเน้นไปที่การบังคับความสูง
+            // 3. กำหนดค่า PDF
             const opt = {
                 margin:       10,
                 filename:     'School_Safety_Comparison_Report.pdf',
@@ -53,18 +65,20 @@
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
-                    // --- จุดแก้สำคัญอยู่ตรงนี้ ---
                     windowWidth: document.documentElement.offsetWidth,
-                    windowHeight: document.documentElement.scrollHeight, // บังคับให้เรนเดอร์ความสูงทั้งหมด
-                    scrollY: -window.scrollY // ป้องกันภาพเลื่อน
+                    windowHeight: document.body.scrollHeight // บังคับอ่านความสูงทั้งหมดของเอกสาร
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                // เปลี่ยนโหมดการตัดหน้า
-                pagebreak:    { mode: 'legacy' } 
+                pagebreak:    { mode: 'avoid-all', before: '.page-break-before' } // ตั้งค่าการตัดหน้า
             };
         
-            // ใช้คำสั่งนี้เพื่อดาวน์โหลด
-            html2pdf().set(opt).from(element).save();
+            // 4. สั่ง Save
+            html2pdf().set(opt).from(element).save().then(() => {
+                // 5. คืนค่าสไตล์เดิมกลับไปหลังบันทึกเสร็จ
+                modal.style.maxHeight = originalModalStyles.maxHeight;
+                modal.style.overflow = originalModalStyles.overflow;
+                overlay.style.overflow = originalOverlayStyles.overflow;
+            });
         }
     </script>
     
