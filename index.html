@@ -42,54 +42,29 @@
         }
 
         // ฟังก์ชันสำหรับส่งออกและดาวน์โหลดเนื้อหาใน Modal เป็นไฟล์ PDF
-        // ฟังก์ชันสำหรับส่งออกและดาวน์โหลดเนื้อหาใน Modal เป็นไฟล์ PDF (ฉบับแก้ไขปัญหาหน้าโดนตัด)
         function exportToPDF() {
             const element = document.getElementById('compareResultContent');
-            const modal = document.querySelector('.compare-modal');
-        
-            // 1. บันทึกสไตล์เดิมของ Modal และ Element เก็บไว้
-            const origModalMaxHeight = modal ? modal.style.maxHeight : '';
-            const origModalOverflow = modal ? modal.style.overflow : '';
-            const origElemOverflow = element.style.overflow;
-        
-            // 2. ปลดล็อกความสูงและ Scroll ชั่วคราว เพื่อให้เรนเดอร์เนื้อหาทั้งหมดได้ 100%
-            if (modal) {
-                modal.style.maxHeight = 'none';
-                modal.style.overflow = 'visible';
-            }
-            element.style.overflow = 'visible';
-        
-            // 3. กำหนดตัวเลือกสำหรับ PDF
+            
+            // ตั้งค่าตัวเลือกโดยเน้นไปที่การบังคับความสูง
             const opt = {
-                margin:       [10, 10, 10, 10], // ระยะขอบ [บน, ซ้าย, ล่าง, ขวา] (mm)
+                margin:       10,
                 filename:     'School_Safety_Comparison_Report.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
-                    scrollY: 0, // บังคับจับภาพตั้งแต่จุดเริ่มต้น ป้องกันปัญหาพิกัดคลาดเคลื่อน
-                    windowWidth: document.documentElement.offsetWidth
+                    // --- จุดแก้สำคัญอยู่ตรงนี้ ---
+                    windowWidth: document.documentElement.offsetWidth,
+                    windowHeight: document.documentElement.scrollHeight, // บังคับให้เรนเดอร์ความสูงทั้งหมด
+                    scrollY: -window.scrollY // ป้องกันภาพเลื่อน
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] } // รองรับการตัดหน้าใหม่อัตโนมัติเมื่อเนื้อหายาวหลายหน้า
+                // เปลี่ยนโหมดการตัดหน้า
+                pagebreak:    { mode: 'legacy' } 
             };
         
-            // 4. เริ่มประมวลผล PDF
-            html2pdf().set(opt).from(element).save().then(() => {
-                // เมื่อดาวน์โหลดเสร็จ คืนค่าสไตล์กลับเป็นเหมือนเดิมเพื่อความสวยงามของ Modal
-                if (modal) {
-                    modal.style.maxHeight = origModalMaxHeight;
-                    modal.style.overflow = origModalOverflow;
-                }
-                element.style.overflow = origElemOverflow;
-            }).catch(err => {
-                console.error("PDF Export error:", err);
-                if (modal) {
-                    modal.style.maxHeight = origModalMaxHeight;
-                    modal.style.overflow = origModalOverflow;
-                }
-                element.style.overflow = origElemOverflow;
-            });
+            // ใช้คำสั่งนี้เพื่อดาวน์โหลด
+            html2pdf().set(opt).from(element).save();
         }
     </script>
     
@@ -504,11 +479,17 @@
                 height: auto;
             }
         }
-        /* ป้องกันองค์ประกอบหลักถูกตัดครึ่งแผ่นตอนขึ้นหน้าใหม่ใน PDF */
-        .markdown-content table, 
-        .markdown-content tr, 
-        .info-card {
-            page-break-inside: avoid;
+        /* บังคับให้เนื้อหาใน Modal ขยายเต็มที่ตอนพิมพ์ PDF */
+        @media print {
+            #compareResultContent {
+                height: auto !important;
+                overflow: visible !important;
+            }
+            
+            .compare-modal {
+                overflow: visible !important;
+                max-height: none !important;
+            }
         }
     </style>
 </head>
