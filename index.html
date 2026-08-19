@@ -70,14 +70,29 @@
             overflow: hidden;
         }
 
+        /* ขยายความกว้าง Popup ให้รองรับแนวนอน */
         .leaflet-popup-content {
             margin: 0 !important;
-            width: 340px !important;
-            max-width: 90vw;
+            width: 650px !important; /* ปรับจาก 340px เป็น 650px */
+            max-width: 95vw;
             line-height: 1.5;
             color: #1e293b;
         }
-
+        /* คลาสสำหรับแบ่ง 2 คอลัมน์ซ้าย-ขวา */
+        .popup-horizontal-container {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+        .popup-col-left {
+            flex: 1; /* ฝั่งซ้าย (ข้อมูลโรงเรียน + ผลวิเคราะห์ AI) */
+            min-width: 0;
+        }
+        
+        .popup-col-right {
+            flex: 1; /* ฝั่งขวา (ตารางคำนวณคะแนน) */
+            min-width: 0;
+        }
         /* =========================================
             องค์ประกอบ UI การประเมินความเสี่ยง
             ========================================= */
