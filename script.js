@@ -21,7 +21,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 const NGROK_URL = 'https://tipped-roast-tamale.ngrok-free.dev'; 
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbz9hjgjQPYlVYKMrvae0gDfqzoDsea8IRZRsSdSjv1IkgN6kF0i_LarNBYLyHn-DHaLUQ/exec';
 
-const schoolMarkers = L.layerGroup().addTo(map);
+const schoolMarkers = L.featureGroup().addTo(map);
 
 // ==========================================
 // ย้ายระบบค้นหามาไว้ตรงนี้ (เพื่อให้โหลดทันทีโดยไม่ต้องรอ Fetch)
