@@ -410,6 +410,7 @@ fetch(GAS_URL)
         zoom: 16,
         marker: false,
         textPlaceholder: 'ค้นหาชื่อโรงเรียน...',
+        position: 'topright' // <--- เพิ่มบรรทัดนี้เพื่อให้ย้ายไปอยู่มุมขวาบน
       })
     );
   })
