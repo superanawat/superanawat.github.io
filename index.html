@@ -499,14 +499,38 @@
         }
         /* บังคับให้เนื้อหาใน Modal ขยายเต็มที่ตอนพิมพ์ PDF */
         @media print {
-            #compareResultContent {
-                height: auto !important;
-                overflow: visible !important;
-            }
-            
-            .compare-modal {
-                overflow: visible !important;
+            /* 1. ยกเลิกการจำกัดความสูงและ Scrollbar เพื่อให้เนื้อหาไหลเต็มหน้ากระดาษ */
+            #compareResultContent > div {
                 max-height: none !important;
+                overflow: visible !important;
+                display: block !important; /* เปลี่ยนจาก Flex เพื่อลดปัญหาล้นขอบ */
+                width: 100% !important;
+                padding: 0 !important;
+            }
+        
+            /* 2. บังคับให้กราฟ Chart.js หดตัวพอดีกับหน้ากระดาษ */
+            #compareResultContent canvas {
+                max-width: 100% !important;
+                height: auto !important;
+                object-fit: contain !important;
+            }
+        
+            /* 3. ลบขอบและเงาของกล่องต่างๆ ออก เพื่อให้ดูสะอาดตาบน PDF */
+            #compareResultContent > div > div {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 0 20px 0 !important;
+            }
+        
+            /* 4. ป้องกันไม่ให้ข้อความหรือกราฟถูกตัดแบ่งครึ่งระหว่างเปลี่ยนหน้ากระดาษ */
+            h3, .markdown-content, canvas {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+        
+            /* 5. ซ่อนปุ่มต่างๆ หรือแถบที่ไม่จำเป็นต้องโชว์ใน PDF (ถ้ามี) */
+            .btn-close, .compare-bar {
+                display: none !important;
             }
         }
     </style>
