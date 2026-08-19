@@ -43,30 +43,33 @@
 
         async function exportToPDF() {
             const source = document.getElementById('compareResultContent');
-            
-            // 1. สร้าง Container ชั่วคราวไว้นอกหน้าจอ เพื่อให้ความสูงไหลได้อิสระ ไม่โดน Modal บล็อก
+            if (!source) return;
+        
+            // 1. สร้าง Container ชั่วคราวให้อยู่พิกัด (0,0) แต่ซ่อนไว้ด้านหลังสุด
             const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
+            tempContainer.style.position = 'fixed';
             tempContainer.style.top = '0';
-            tempContainer.style.width = '750px'; // ขนาดความกว้างพอดีกระดาษ A4
+            tempContainer.style.left = '0';
+            tempContainer.style.width = '794px'; // ความกว้างมาตรฐาน A4
+            tempContainer.style.zIndex = '-9999';
             tempContainer.style.background = '#ffffff';
             tempContainer.style.padding = '20px';
-            
-            // 2. คัดลอก (Clone) เนื้อหาทั้งหมดมาใส่ใน Container ชั่วคราว
+            tempContainer.style.boxSizing = 'border-box';
+        
+            // 2. คัดลอก (Clone) เนื้อหา
             const clone = source.cloneNode(true);
-            
-            // 3. แปลง <canvas> ของ Chart.js ให้กลายเป็น <img> PNG (แก้ปัญหากราฟหาย/ตัดขาดตอน Clone)
+        
+            // 3. แปลง <canvas> ของ Chart.js ให้เป็น <img> PNG
             const origCanvases = source.querySelectorAll('canvas');
             const cloneCanvases = clone.querySelectorAll('canvas');
-            
+        
             origCanvases.forEach((origCanvas, index) => {
                 const img = document.createElement('img');
                 img.src = origCanvas.toDataURL('image/png');
                 img.style.width = '100%';
                 img.style.height = 'auto';
                 img.style.display = 'block';
-                
+        
                 if (cloneCanvases[index]) {
                     cloneCanvases[index].parentNode.replaceChild(img, cloneCanvases[index]);
                 }
@@ -75,7 +78,7 @@
             tempContainer.appendChild(clone);
             document.body.appendChild(tempContainer);
         
-            // 4. ตั้งค่า html2pdf สำหรับการตัดหน้าให้อัตโนมัติ
+            // 4. ตั้งค่า html2pdf โดยล็อกพิกัด Scroll
             const opt = {
                 margin:       [10, 10, 10, 10],
                 filename:     'School_Safety_Comparison_Report.pdf',
@@ -83,19 +86,21 @@
                 html2canvas:  { 
                     scale: 2, 
                     useCORS: true,
-                    logging: false
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: 794
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['css', 'legacy'] } // บังคับขึ้นหน้าใหม่อัตโนมัติเมื่อเนื้อหายาวเกินหน้า A4
+                pagebreak:    { mode: ['css', 'legacy'] }
             };
         
             try {
-                // 5. สั่งสร้าง PDF จาก Container ชั่วคราว
                 await html2pdf().set(opt).from(tempContainer).save();
             } catch (error) {
                 console.error("Export PDF Error:", error);
             } finally {
-                // 6. ลบ Container ชั่วคราวทิ้งทันทีเมื่อทำเสร็จ
+                // 5. ลบ Container ชั่วคราวออกเมื่อประมวลผลเสร็จ
                 document.body.removeChild(tempContainer);
             }
         }
