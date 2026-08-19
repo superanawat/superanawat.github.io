@@ -108,7 +108,9 @@ function executeComparison() {
 
     fetch(`${NGROK_URL}/compare`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 
+                   'ngrok-skip-browser-warning': 'true' // <--- เพิ่มบรรทัดนี้
+                 },
         body: JSON.stringify({
             school1: {
                 name: schoolsToCompare[0].name,
@@ -197,7 +199,9 @@ fetch(GAS_URL)
 
           fetch(`${NGROK_URL}/analyze`, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json',
+                       'ngrok-skip-browser-warning': 'true' // <--- เพิ่มบรรทัดนี้
+                     },
             body: JSON.stringify({
               name: school.name,
               address: school.address,
