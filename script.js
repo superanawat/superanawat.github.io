@@ -212,21 +212,45 @@ fetch(GAS_URL)
 
         // จัดการเหตุการณ์เมื่อกดปุ่ม "ให้ AI วิเคราะห์โรงเรียนนี้" (โค้ดเดิมของคุณ)
         analyzeBtn.addEventListener('click', () => {
-          aiBox.innerHTML = `
-            <div style="padding: 10px; text-align: center; color: #4f46e5; font-weight: 500;">
-              <svg class="gemini-sparkle" viewBox="0 0 24 24" width="20" height="20" fill="none" style="margin-right: 6px;">
-                <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" fill="url(#gemini-grad)"/>
-                <defs>
-                  <linearGradient id="gemini-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#4285F4" />
-                    <stop offset="50%" stop-color="#9B72CB" />
-                    <stop offset="100%" stop-color="#D96570" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              กำลังให้ AI วิเคราะห์ข้อมูล...
+        aiBox.innerHTML = `
+          <div class="popup-horizontal-container" style="border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 10px;">
+            
+            <!-- ฝั่งซ้าย: ข้อความวิเคราะห์ AI -->
+            <div class="popup-col-left">
+              <div style="font-size: 12px; color: #334155;">
+                ${formattedResult}
+              </div>
             </div>
-          `;
+        
+            <!-- ฝั่งขวา: ตารางขั้นตอนการคำนวณคะแนน -->
+            <div class="popup-col-right">
+              <details class="calc-details" open style="margin-top: 0;">
+                <summary style="cursor: pointer; font-weight: 600; color: #1e293b; background: #f1f5f9; padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 11px;">
+                  🔍 รายละเอียดคะแนน (${score}/10)
+                </summary>
+                <div class="calc-body" style="padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 6px 6px;">
+                  <table class="weight-table" style="width: 100%; border-collapse: collapse; font-size: 10px;">
+                    <thead>
+                      <tr style="border-bottom: 1px solid #cbd5e1; text-align: left;">
+                        <th style="padding: 3px;">ปัจจัย</th>
+                        <th style="padding: 3px;">น้ำหนัก</th>
+                        <th style="padding: 3px;">คะแนน</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${breakdownRowsHtml}
+                    </tbody>
+                  </table>
+                  <div class="total-box" style="margin-top: 6px; padding: 6px; background: #fef2f2; border-left: 3px solid #ef4444; border-radius: 4px; color: #991b1b; font-size: 10px;">
+                    <strong>รวม:</strong> ${scorePartsString} = <strong>${sumScore100.toFixed(1)} / 100</strong><br>
+                    สเกล 10 = <strong>${score} / 10</strong> ${icons}
+                  </div>
+                </div>
+              </details>
+            </div>
+        
+          </div>
+        `;
           analyzeBtn.style.display = 'none';
 
           fetch(`${NGROK_URL}/analyze`, {
