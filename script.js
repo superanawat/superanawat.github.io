@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
 // ==========================================
 // 2. ตั้งค่าแผนที่และ Layer Group
 // ==========================================
-var map = L.map('map').setView([16.4321, 102.8356], 11);
+var map = L.map('map').setView([16.4321, 102.8356], 7);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -389,6 +389,16 @@ fetch(GAS_URL)
         marker.addTo(schoolMarkers);
       }
     });
+
+
+    // ==========================================
+    // ปรับซูมอัตโนมัติให้เห็นหมุดทั้งหมดทุกพื้นที่ (ทั้ง 2 จังหวัด) ตรงนี้!
+    // ==========================================
+    if (schoolMarkers.getLayers().length > 0) {
+      map.fitBounds(schoolMarkers.getBounds(), {
+        padding: [50, 50] // เว้นขอบรอบแผนที่เล็กน้อยไม่ให้หมุดชิดขอบเกินไป
+      });
+    }
 
     // ==========================================
     // 5. ระบบ ค้นหาชื่อโรงเรียน (Leaflet Search)
