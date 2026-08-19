@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
 // ==========================================
 // 2. ตั้งค่าแผนที่และ Layer Group
 // ==========================================
-var map = L.map('map').setView([16.4321, 102.8356], 7);
+var map = L.map('map').setView([16.4321, 102.8356], 9);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
