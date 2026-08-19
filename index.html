@@ -42,43 +42,47 @@
         }
 
         // ฟังก์ชันสำหรับส่งออกและดาวน์โหลดเนื้อหาใน Modal เป็นไฟล์ PDF
+        // ฟังก์ชันสำหรับส่งออกและดาวน์โหลดเนื้อหาใน Modal เป็นไฟล์ PDF
         function exportToPDF() {
-            // 1. เลือก Element หลัก
             const element = document.getElementById('compareResultContent');
             const modal = document.querySelector('.compare-modal');
             const overlay = document.querySelector('.compare-modal-overlay');
         
-            // 2. ปรับสไตล์เพื่อบังคับให้ทุกอย่าง "กางออก" เต็มที่
-            // บังคับให้ Modal และ overlay เลิกจำกัดความสูง
-            const originalModalStyles = { maxHeight: modal.style.maxHeight, overflow: modal.style.overflow };
-            const originalOverlayStyles = { position: overlay.style.position, overflow: overlay.style.overflow };
+            // 1. เก็บค่าสไตล์เดิมไว้ก่อน
+            const originalModalMaxHeight = modal.style.maxHeight;
+            const originalModalOverflow = modal.style.overflow;
+            const originalOverlayOverflow = overlay.style.overflow;
         
+            // 2. ปรับสไตล์เพื่อขยายความสูงให้แสดงผลครบถ้วน
             modal.style.maxHeight = 'none';
             modal.style.overflow = 'visible';
             overlay.style.overflow = 'visible';
-            
-            // 3. กำหนดค่า PDF
-            const opt = {
-                margin:       10,
-                filename:     'School_Safety_Comparison_Report.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true,
-                    windowWidth: document.documentElement.offsetWidth,
-                    windowHeight: document.body.scrollHeight // บังคับอ่านความสูงทั้งหมดของเอกสาร
-                },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: 'avoid-all', before: '.page-break-before' } // ตั้งค่าการตัดหน้า
-            };
         
-            // 4. สั่ง Save
-            html2pdf().set(opt).from(element).save().then(() => {
-                // 5. คืนค่าสไตล์เดิมกลับไปหลังบันทึกเสร็จ
-                modal.style.maxHeight = originalModalStyles.maxHeight;
-                modal.style.overflow = originalModalStyles.overflow;
-                overlay.style.overflow = originalOverlayStyles.overflow;
-            });
+            // 3. ใช้ setTimeout เล็กน้อยเพื่อให้ Browser คำนวณความสูงหน้าเว็บใหม่ (Reflow) ก่อนพิมพ์
+            setTimeout(() => {
+                const opt = {
+                    margin:       10,
+                    filename:     'School_Safety_Comparison_Report.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true,
+                        windowWidth: element.scrollWidth,
+                        windowHeight: element.scrollHeight, // ดึงความสูงจริงทั้งหมดของเนื้อหา
+                        scrollY: 0
+                    },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak:    { mode: ['css', 'legacy'] } // เปลี่ยนจาก avoid-all เป็นโหมดอนุญาตให้ตัดหน้าขึ้นหน้าใหม่ได้ตามจริง
+                };
+        
+                // 4. สั่ง Save PDF
+                html2pdf().set(opt).from(element).save().then(() => {
+                    // 5. คืนค่าสไตล์เดิมกลับหลังดาวน์โหลดเสร็จ
+                    modal.style.maxHeight = originalModalMaxHeight;
+                    modal.style.overflow = originalModalOverflow;
+                    overlay.style.overflow = originalOverlayOverflow;
+                });
+            }, 300); // หน่วงเวลา 300 มิลลิวินาที
         }
     </script>
     
