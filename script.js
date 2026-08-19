@@ -108,9 +108,10 @@ function executeComparison() {
 
     fetch(`${NGROK_URL}/compare`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 
-                   'ngrok-skip-browser-warning': 'true' // <--- เพิ่มบรรทัดนี้
-                 },
+        headers: { 
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true' // ใส่ไว้กัน Ngrok warning
+        },
         body: JSON.stringify({
             school1: {
                 name: schoolsToCompare[0].name,
@@ -126,9 +127,13 @@ function executeComparison() {
     })
     .then(res => res.json())
     .then(data => {
-        // ใช้ marked.js (ที่ประกาศใน index.html) แปลง Markdown เป็น HTML สวยๆ
-        const htmlContent = marked.parse(data.result);
-        compareResultContent.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
+        // ✅ เช็คว่ามีข้อมูล comparison_result ส่งกลับมาจริงๆ
+        if (data && data.comparison_result) {
+            const htmlContent = marked.parse(data.comparison_result);
+            compareResultContent.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
+        } else {
+            compareResultContent.innerHTML = `<div class="loading-text" style="color:red;">❌ ไม่พบข้อมูลการเปรียบเทียบจากเซิร์ฟเวอร์</div>`;
+        }
     })
     .catch(err => {
         console.error("Error comparing:", err);
