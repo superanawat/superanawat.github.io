@@ -116,45 +116,128 @@ function clearSelectedSchools() {
     console.log("ล้างข้อมูลโรงเรียนที่เลือกเรียบร้อยแล้ว พร้อมเลือกใหม่");
 }
 
+// ==========================================
+// ฟังก์ชันเปรียบเทียบโรงเรียนพร้อมแสดงกราฟ (Chart.js)
+// ==========================================
 function executeComparison() {
-    if (schoolsToCompare.length !== 2) return;
-
-    compareModalOverlay.style.display = 'flex';
-    compareResultContent.innerHTML = `<div class="loading-text">⏳ กำลังให้ AI (Ollama) วิเคราะห์เปรียบเทียบ...<br>อาจใช้เวลาประมาณ 10-30 วินาที</div>`;
-
-    fetch(`${NGROK_URL}/compare`, {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true'
-        },
-        body: JSON.stringify({
-            school1: {
-                name: schoolsToCompare[0].name,
-                lat: schoolsToCompare[0].lat,
-                lng: schoolsToCompare[0].lng
+        if (schoolsToCompare.length !== 2) return;
+    
+        // เปิด Modal และแสดงสถานะกำลังโหลด
+        compareModalOverlay.style.display = 'flex';
+        compareResultContent.innerHTML = `
+            <div class="loading-text" style="text-align: center; padding: 30px;">
+                ⏳ กำลังให้ AI (Ollama) วิเคราะห์และประมวลผลกราฟเปรียบเทียบ...<br>อาจใช้เวลาประมาณ 10-30 วินาที
+            </div>
+        `;
+    
+        fetch(`${NGROK_URL}/compare`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': 'true'
             },
-            school2: {
-                name: schoolsToCompare[1].name,
-                lat: schoolsToCompare[1].lat,
-                lng: schoolsToCompare[1].lng
+            body: JSON.stringify({
+                school1: {
+                    name: schoolsToCompare[0].name,
+                    lat: schoolsToCompare[0].lat,
+                    lng: schoolsToCompare[0].lng
+                },
+                school2: {
+                    name: schoolsToCompare[1].name,
+                    lat: schoolsToCompare[1].lat,
+                    lng: schoolsToCompare[1].lng
+                }
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.comparison_result) {
+                const htmlContent = marked.parse(data.comparison_result);
+                
+                // สมมติว่าฝั่ง backend ส่งคะแนนแยกตามหัวข้อมาด้วย (เช่น data.metrics) 
+                // หรือถ้า backend ส่งมาเป็นข้อความอย่างเดียว เราสามารถดึงชื่อโรงเรียนมาสร้างโครงสร้างกราฟจำลอง / หรือปรับ Backend ให้ส่ง JSON คะแนนคู่กันมาได้ครับ
+                const school1Name = schoolsToCompare[0].name;
+                const school2Name = schoolsToCompare[1].name;
+    
+                // ตัวอย่างโครงสร้าง HTML ที่มีพื้นที่สำหรับกราฟและข้อความ AI
+                compareResultContent.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 20px; max-height: 75vh; overflow-y: auto; padding: 10px;">
+                        
+                        <!-- ส่วนแสดงกราฟเปรียบเทียบ -->
+                        <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <h3 style="margin-top: 0; font-size: 15px; color: #1e293b; text-align: center; margin-bottom: 10px;">📊 กราฟเปรียบเทียบคะแนนความเสี่ยง</h3>
+                            <div style="position: relative; height: 280px; width: 100%;">
+                                <canvas id="schoolCompareChart"></canvas>
+                            </div>
+                        </div>
+    
+                        <!-- ส่วนแสดงผลวิเคราะห์แบบข้อความจาก AI -->
+                        <div style="background: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <h3 style="margin-top: 0; font-size: 15px; color: #1e293b; margin-bottom: 10px;">📝 บทวิเคราะห์เชิงลึก</h3>
+                            <div class="markdown-content" style="font-size: 13px; color: #334155; line-height: 1.6;">
+                                ${htmlContent}
+                            </div>
+                        </div>
+    
+                    </div>
+                `;
+    
+                // สร้างกราฟด้วย Chart.js
+                const ctx = document.getElementById('schoolCompareChart').getContext('2d');
+                
+                // *หมายเหตุ: คุณสามารถเปลี่ยนค่าตัวเลข data ด้านล่างนี้ให้ดึงมาจากค่าที่ AI วิเคราะห์จริงของแต่ละโรงเรียนได้
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['ความเสี่ยงภาพรวม', 'ด้านครอบครัว', 'ด้านสิ่งแวดล้อม/ยาเสพติด', 'ด้านพฤติกรรม', 'ด้านความปลอดภัยออนไลน์'],
+                        datasets: [
+                            {
+                                label: school1Name,
+                                data: [7.5, 6.0, 8.0, 5.5, 6.5], // ตัวอย่างข้อมูลคะแนนโรงเรียนที่ 1
+                                backgroundColor: 'rgba(37, 99, 235, 0.7)',
+                                borderColor: 'rgba(37, 99, 235, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: school2Name,
+                                data: [4.5, 5.0, 3.0, 6.0, 4.0], // ตัวอย่างข้อมูลคะแนนโรงเรียนที่ 2
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                borderColor: 'rgba(16, 185, 129, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10,
+                                ticks: { font: { size: 11 } }
+                            },
+                            x: {
+                                ticks: { font: { size: 11 } }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { font: { size: 12 } }
+                            }
+                        }
+                    }
+                });
+    
+            } else {
+                compareResultContent.innerHTML = `<div class="loading-text" style="color:red; text-align:center; padding: 20px;">❌ ไม่พบข้อมูลการเปรียบเทียบจากเซิร์ฟเวอร์</div>`;
             }
         })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data && data.comparison_result) {
-            const htmlContent = marked.parse(data.comparison_result);
-            compareResultContent.innerHTML = `<div class="markdown-content">${htmlContent}</div>`;
-        } else {
-            compareResultContent.innerHTML = `<div class="loading-text" style="color:red;">❌ ไม่พบข้อมูลการเปรียบเทียบจากเซิร์ฟเวอร์</div>`;
-        }
-    })
-    .catch(err => {
-        console.error("Error comparing:", err);
-        compareResultContent.innerHTML = `<div class="loading-text" style="color:red;">❌ เกิดข้อผิดพลาดในการเชื่อมต่อ AI</div>`;
-    });
-}
+        .catch(err => {
+            console.error("Error comparing:", err);
+            compareResultContent.innerHTML = `<div class="loading-text" style="color:red; text-align:center; padding: 20px;">❌ เกิดข้อผิดพลาดในการเชื่อมต่อ AI</div>`;
+        });
+    }
 
 // ==========================================
 // 4. ดึงข้อมูลโรงเรียนและสร้าง Popup บนแผนที่
