@@ -99,6 +99,20 @@ function closeModal() {
     cancelComparison(); // เมื่อปิดแล้ว ให้เคลียร์คิวด้วย
 }
 
+// ฟังก์ชันล้างข้อมูลโรงเรียนที่เลือกทั้งหมด
+function clearSelectedSchools() {
+    // 1. ล้างข้อมูลโรงเรียนในอาเรย์เปรียบเทียบ
+    schoolsToCompare = [];
+    
+    // 2. อัปเดต UI ของแถบเปรียบเทียบ (ซ่อนแถบและรีเซ็ตข้อความ)
+    updateCompareUI();
+    
+    // 3. ปิด Popup บนแผนที่ทั้งหมด เพื่อรีเซ็ตสถานะปุ่ม "เลือกเปรียบเทียบ" กลับเป็นปกติ
+    map.closePopup();
+
+    console.log("ล้างข้อมูลโรงเรียนที่เลือกเรียบร้อยแล้ว พร้อมเลือกใหม่");
+}
+
 function executeComparison() {
     if (schoolsToCompare.length !== 2) return;
 
@@ -205,7 +219,7 @@ fetch(GAS_URL)
           fetch(`${NGROK_URL}/analyze`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
-                       'ngrok-skip-browser-warning': 'true' // <--- เพิ่มบรรทัดนี้
+                      'ngrok-skip-browser-warning': 'true'
                      },
             body: JSON.stringify({
               name: school.name,
